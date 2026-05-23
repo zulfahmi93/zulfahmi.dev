@@ -10,7 +10,7 @@ on `DESIGN.md`.
 - **Next.js 16** (App Router) · **React 19** · **TypeScript**
 - **Tailwind 4** with a `--zf-*` token bridge in `app/globals.css`
 - Fonts via `next/font`: **Fraunces** (display) · **Inter** (UI) · **JetBrains Mono** (code)
-- Deploy: **OpenNext → Cloudflare Workers** (`zulfahmi.dev`)
+- Deploy: **static export → GitHub Pages** (`zulfahmi.dev`)
 - Quality gates: **Playwright** e2e + **axe-core** a11y, **Lighthouse CI**
 
 ## Local development
@@ -20,21 +20,28 @@ npm install
 npm run dev          # http://localhost:3000
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
-npm run build        # production build (all routes prerendered)
+npm run build        # static export to out/ (all routes prerendered)
+npm run preview      # serve the out/ export locally
 npm run e2e:install  # one-time: Playwright chromium
 npm run e2e          # smoke + a11y (boots the dev server automatically)
 npm run lhci         # Lighthouse budgets
 ```
 
-## Deploy (Cloudflare)
+## Deploy (GitHub Pages)
 
-```bash
-npm run deploy:dev   # dev.zulfahmi.dev
-npm run deploy:prod  # zulfahmi.dev
-```
+Pushing to `main` triggers `.github/workflows/deploy.yml`: it type-checks, lints,
+runs `next build` (static export to `out/`), and publishes via GitHub Pages.
 
-Requires the `zulfahmi.dev` zone active in Cloudflare and `wrangler` auth. Routes are
-configured in `wrangler.jsonc`.
+One-time setup:
+
+1. Push this repo to GitHub (a **public** repo for free Pages).
+2. Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+3. The apex domain is pinned by `public/CNAME` (`zulfahmi.dev`); enable
+   **Enforce HTTPS** once DNS resolves.
+4. Point DNS for the apex `zulfahmi.dev` at GitHub Pages:
+   - `A` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+   - `AAAA` → `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`
+   - optional `www` → `CNAME` to `<user>.github.io`
 
 ## Structure
 

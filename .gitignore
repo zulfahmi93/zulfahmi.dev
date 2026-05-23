@@ -7,8 +7,7 @@
 /.next/
 /out/
 
-# production / cloudflare
-/build
+# stale local caches from the old cloudflare tooling (dirs may linger)
 /.open-next/
 /.wrangler/
 

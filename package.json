@@ -5,19 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "preview": "npx --yes serve out",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "build:cf": "opennextjs-cloudflare build",
-    "preview": "opennextjs-cloudflare build && wrangler dev",
-    "deploy:dev": "opennextjs-cloudflare build && wrangler deploy --env dev",
-    "deploy:prod": "opennextjs-cloudflare build && wrangler deploy --env prod",
     "lhci": "lhci autorun",
     "e2e": "playwright test",
     "e2e:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.19.10",
     "@react-three/fiber": "^9.6.1",
     "@shadergradient/react": "^2.4.20",
     "next": "16.2.6",
@@ -37,8 +32,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
-    "typescript": "^6",
-    "wrangler": "^4.92.0"
+    "typescript": "^6"
   },
   "overrides": {
     "@lhci/cli": {

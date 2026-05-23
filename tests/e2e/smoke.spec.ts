@@ -20,14 +20,14 @@ test.describe("portfolio smoke", () => {
     const nav = page.locator(".zf-nav");
 
     await nav.getByRole("link", { name: "Work" }).click();
-    await expect(page).toHaveURL(/\/work$/);
+    await expect(page).toHaveURL(/\/work\/?$/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/Projects/i);
 
     await nav.getByRole("link", { name: "About" }).click();
-    await expect(page).toHaveURL(/\/about$/);
+    await expect(page).toHaveURL(/\/about\/?$/);
 
     await nav.getByRole("link", { name: "Contact" }).click();
-    await expect(page).toHaveURL(/\/contact$/);
+    await expect(page).toHaveURL(/\/contact\/?$/);
     await expect(page.getByText(SITE.email)).toBeVisible();
   });
 
@@ -36,7 +36,7 @@ test.describe("portfolio smoke", () => {
     await expect(page.locator(".zf-card")).toHaveCount(4);
 
     await page.getByRole("link", { name: /DuitNow Payments App/ }).click();
-    await expect(page).toHaveURL(/\/work\/duitnow$/);
+    await expect(page).toHaveURL(/\/work\/duitnow\/?$/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/DuitNow/);
     await expect(page.getByText("Technical notes")).toBeVisible();
   });

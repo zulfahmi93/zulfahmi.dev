@@ -1,13 +1,9 @@
 module.exports = {
   ci: {
     collect: {
-      startServerCommand: "npm run start",
-      url: [
-        "http://localhost:3000/",
-        "http://localhost:3000/work",
-        "http://localhost:3000/about",
-        "http://localhost:3000/contact",
-      ],
+      // Lighthouse runs against the static export; LHCI serves out/ itself.
+      // Run `npm run build` before `npm run lhci`.
+      staticDistDir: "./out",
       numberOfRuns: 1,
       settings: { preset: "desktop" },
     },
