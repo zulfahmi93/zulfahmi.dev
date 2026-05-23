@@ -1,0 +1,35 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# next.js
+/.next/
+/out/
+
+# production / cloudflare
+/build
+/.open-next/
+/.wrangler/
+
+# testing
+/coverage
+/playwright-report/
+/test-results/
+/.lighthouseci/
+
+# env
+.env
+.env*.local
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# source assets (served copies live in public/)
+/raw/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*

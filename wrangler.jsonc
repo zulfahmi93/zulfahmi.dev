@@ -1,0 +1,47 @@
+/**
+ * Cloudflare Workers config for zulfahmi-portfolio.
+ *
+ * Two environments: dev (dev.zulfahmi.dev) + prod (zulfahmi.dev).
+ * Default top-level config is used by `wrangler dev` (local preview).
+ *
+ * Routes require the zone (zulfahmi.dev) be active in Cloudflare.
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zulfahmi-portfolio-dev",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "env": {
+    "dev": {
+      "name": "zulfahmi-portfolio-dev",
+      "routes": [
+        {
+          "pattern": "dev.zulfahmi.dev",
+          "custom_domain": true
+        }
+      ]
+    },
+    "prod": {
+      "name": "zulfahmi-portfolio-prod",
+      "routes": [
+        {
+          "pattern": "zulfahmi.dev",
+          "custom_domain": true
+        },
+        {
+          "pattern": "www.zulfahmi.dev",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
+}
