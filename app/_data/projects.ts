@@ -57,7 +57,7 @@ export const PROJECTS: Project[] = [
   {
     slug: "duitnow",
     name: "DuitNow Payments App",
-    tagline: "QR payments and DuitNow transfers in Flutter, with biometrics before money moves.",
+    tagline: "A DuitNow payments client built like money matters: real bank-QR parsing, integer-cent money, and biometrics before every debit.",
     domain: "Mobile · Payments",
     year: "2026",
     role: "Sole engineer",
@@ -65,66 +65,75 @@ export const PROJECTS: Project[] = [
     lead: true,
     stack: ["Flutter", "Dart", "Riverpod", "Freezed", "local_auth"],
     summary: {
-      problem: "Payment flows need exact QR parsing, strict input checks, and clear confirmation before money moves.",
+      problem: "Payments are unforgiving: a mis-parsed QR, a rounding error, or a debit without consent is a real-world failure, not a bug ticket.",
       role: "Sole Flutter engineer",
-      result: "Demo complete with biometric gating before every sensitive action, and 71 tests.",
+      result: "A working client in one night — a real CIMB production QR parsed and checksum-verified, integer-cent money end to end, biometrics before every debit, 71 tests.",
     },
     problem:
-      "DuitNow QR and DuitNow Transfer leave little room for guesswork: the QR payload has to match EMVCo rules, and every payment screen has to treat money and identity carefully. I built a working Flutter client over one night as a focused payments exercise.",
+      "DuitNow QR and DuitNow Transfer are Malaysia's instant-payment rails, and they punish guesswork: a QR payload has to satisfy EMVCo's tag-length-value structure and a CRC checksum, money has to reconcile to the cent, and no debit should ever happen without the payer's consent. I built a working Flutter client in a single overnight push to hold exactly that bar — not to mock a happy path, but to treat money and identity the way a real wallet has to.",
     built: [
-      "Scan a DuitNow QR, parse the EMVCo payload, verify the checksum, then show a confirmation before any debit.",
-      "Send DuitNow transfers by account, phone number (E.164), or national ID, with bank-specific account rules.",
-      "Require Face ID, fingerprint, or device PIN before sensitive actions.",
-      "Keep error messages on payment screens deliberately non-revealing.",
+      "Scan a DuitNow QR, parse its EMVCo tag-length-value payload, recompute the CRC16-CCITT-FALSE checksum, and refuse any code whose checksum doesn't match — verified against a real CIMB OCTO production QR, not a synthetic fixture — then show an explicit confirmation before any debit.",
+      "Compose DuitNow transfers three ways — bank account (validated against per-bank account-length rules across six banks), phone number (E.164), or national ID (MyKad, checked against the 12-digit format and state-code table) — each on its own validation path before the flow proceeds.",
+      "Gate every money-moving action behind device biometrics — Face ID, fingerprint, or PIN — through local_auth.",
+      "Carry the payment as typed state through a Riverpod provider, never through route parameters, so amount and recipient live in typed app state instead of a tamperable URL.",
+      "Keep money as integer cents from parse to display; floating-point currency never enters the system.",
     ],
     decisions: [
       {
-        title: "Validate before the payment flow",
+        title: "Validate at the boundary, not the button",
         detail:
-          "QR payloads, MyKad values, phone numbers, and bank account formats are checked before the app reaches the confirmation screen.",
+          "QR payloads, MyKad numbers, phone numbers, and per-bank account formats are all checked before the user reaches a confirmation screen. By the time money is on screen, the inputs are already known-good.",
       },
       {
-        title: "Typed failures",
+        title: "Make failure a type, not a surprise",
         detail:
-          "Fallible paths return sealed Result / Failure types, so errors stay explicit. There is no exception-driven control flow and no untyped `as` casts in the codebase.",
+          "Every fallible path returns a sealed Result / Failure (Freezed) instead of throwing. There is no exception-driven control flow and no untyped `as` casts in the hand-written code (generated Freezed and JSON files excepted), so the compiler forces every error to be handled.",
       },
       {
-        title: "Keep payment screens narrow",
+        title: "Money is integer cents, end to end",
         detail:
-          "Sensitive screens require biometrics or device PIN before they act, and avoid error messages that reveal too much.",
+          "Amounts are integer cents from the moment a value is parsed to the moment it is displayed. Floating-point never touches currency, so totals can't drift by a rounding error.",
+      },
+      {
+        title: "Consent and least disclosure on every sensitive screen",
+        detail:
+          "Biometrics gate every debit, the payment intent travels through a provider rather than route params, and user-facing errors stay deliberately non-revealing — the precise failure reason lives in typed failures and tests, never leaked to the UI.",
       },
     ],
     testing: [
-      "40 parser tests cover EMVCo payload parsing and CRC16-CCITT-FALSE verification, including a real bank QR payload.",
-      "I calculated checksum fixtures manually so the parser is tested against known-good values.",
-      "Validators cover MyKad, E.164 phone numbers, and bank-specific account formats.",
-      "The full suite has 71 tests across parsing, validation, failure handling, and payment flow logic.",
+      "40 parser tests across 7 groups cover EMVCo TLV parsing and CRC16-CCITT-FALSE checksum verification.",
+      "Checksum fixtures were derived by hand — the EMVCo reference (\"123456789\" → 0x29B1) plus hand-computed payloads — so the parser is pinned to known-good values, not to its own output.",
+      "Separate suites cover currency math, payment execution, and widget behaviour; validators cover MyKad, E.164 phone numbers, and per-bank account formats.",
+      "71 tests in total — 40 parser, 21 currency, 4 payment-execution, 6 widget — so a regression names exactly which layer broke.",
     ],
     tradeoffs: [
-      "I kept this as a demo client instead of implying access to live banking rails.",
-      "Payment-screen errors are intentionally bland; detailed failure reasons stay inside typed failures and tests.",
+      "This is a demo on a mock backend, by design. Going live on DuitNow needs a PayNet partnership agreement and sandbox access — a commercial gate, not a coding one — so I recorded that as an ADR instead of faking live rails.",
+      "The mock transfer backend declines roughly one in ten attempts on an injectable random, so the failure path is exercised honestly rather than always showing success.",
+      "Payment-screen errors are intentionally non-revealing — a deliberate trade of user-facing diagnostics for not leaking why a payment failed.",
     ],
     nextSteps: [
-      "Wire the native screenshot block (Android FLAG_SECURE / iOS) — the Dart guard is in place, but the platform side is still stubbed.",
-      "Add mocked bank adapters so transfer states can be exercised end to end.",
+      "Finish the native screenshot block — the Dart guard is wired and called, but the Android/iOS platform side is still stubbed, so it does not yet block on a real device.",
+      "Add mocked bank adapters so more transfer outcomes — limits, rejections, timeouts — can be driven end to end.",
       "Add receipt and transaction-history screens without widening the sensitive surface area.",
     ],
     outcome:
-      "A complete, test-backed payments client showing how I approach money movement: validate early, keep sensitive paths narrow, and make failures explicit.",
+      "A test-backed DuitNow client built to be checked, not trusted: a real CIMB production QR parsed and checksum-verified, integer-cent math end to end, typed failures on every fallible path, and biometrics before any debit. Built in one overnight push — honest about what's mocked, rigorous about what isn't.",
     codeSamples: [
       {
         lang: "dart",
-        caption: "EMVCo CRC16-CCITT-FALSE, checked against manual fixtures",
+        caption: "CRC16-CCITT-FALSE, hand-rolled — every scanned QR's checksum is recomputed and a mismatch refuses to parse",
         body: `/// Every EMVCo QR payload ends with a CRC16-CCITT-FALSE checksum
 /// over the preceding bytes, including the "6304" tag and length.
 /// We recompute it and refuse to parse a code whose checksum is wrong.
 int crc16(List<int> data) {
-  var crc = 0xFFFF;
+  var crc = 0xFFFF;                 // CCITT-FALSE initial value
   for (final byte in data) {
-    crc ^= byte << 8;
-    for (var i = 0; i < 8; i++) {
-      crc = (crc & 0x8000) != 0 ? (crc << 1) ^ 0x1021 : crc << 1;
-      crc &= 0xFFFF;
+    crc ^= byte << 8;               // fold next byte into the high byte
+    for (var i = 0; i < 8; i++) {   // then process it one bit at a time
+      crc = (crc & 0x8000) != 0     // is the top bit set?
+          ? (crc << 1) ^ 0x1021     //   yes: shift out, then XOR the polynomial
+          : crc << 1;               //   no:  just shift
+      crc &= 0xFFFF;                // stay 16-bit (Dart ints are 64-bit)
     }
   }
   return crc;
@@ -136,6 +145,71 @@ int crc16(List<int> data) {
       { src: "/work/duitnow/02-send.webp", alt: "Choosing how to identify a DuitNow transfer recipient", caption: "Send" },
       { src: "/work/duitnow/03-confirm.webp", alt: "Payment review screen with recipient, amount, and a biometric confirm button", caption: "Confirm" },
       { src: "/work/duitnow/04-success.webp", alt: "Successful payment receipt with reference number", caption: "Success" },
+    ],
+  },
+  {
+    slug: "myclaaz",
+    name: "MyClaaz",
+    tagline: "The Flutter and Vue front end for a Malaysian tutor marketplace that reached 15,000+ members (2021) across web, iOS, and Android.",
+    domain: "Mobile · Web · EdTech",
+    year: "2020–2023",
+    role: "Front-end engineer (freelance)",
+    status: "Shipped · archived",
+    lead: true,
+    stack: ["Flutter", "Dart", "Vue 2", "Provider", "Google Maps"],
+    summary: {
+      problem: "A two-sided tutor marketplace lives or dies on its phone experience: discovery, scheduling, and payment all have to feel effortless.",
+      role: "Front-end engineer (freelance) — Flutter app + Vue 2 web",
+      result: "Shipped the iOS + Android app and the web front end for a platform that reached 15,000+ members and 14,000+ transactions across 20+ countries (per 2021 press).",
+    },
+    problem:
+      "MyClaaz is a Malaysian EdTech marketplace that connects students with tutors and trainers, founded by Islamic-finance scholar Dr Zaharuddin Abdul Rahman; the platform was a recipient of Cradle Fund start-up assistance. As the freelance front-end engineer, I built the client side — the Flutter app for iOS and Android, and the Vue 2 web front end — against an API owned by the backend developer. A marketplace only works if finding a tutor, booking a slot, and paying all feel simple on a phone, so the front end had to carry discovery, scheduling, media, and payments without friction.",
+    built: [
+      "Built the iOS and Android app in Flutter (Dart) — onboarding, account and PIN login, tutor search, profiles, scheduling, and the purchase flow's client side — across 126 source files in a feature-first architecture.",
+      "Built the customer-facing web front end in Vue 2 against the same backend API.",
+      "Location-based tutor discovery on Google Maps, with subject, distance, date, and duration filters.",
+      "In-app scheduling on a calendar, plus the booking and purchase screens for classes and tutor products like notes and videos.",
+      "Reactive state with Provider and RxDart, networking through Dio, push notifications via OneSignal, and crash reporting via Sentry.",
+    ],
+    decisions: [
+      {
+        title: "Feature-first architecture",
+        detail:
+          "The Flutter codebase is organised by feature — account, search, tutor, transaction, dashboard — rather than by layer, so each screen's pages, models, and state sit together and the app stays navigable as features grow.",
+      },
+      {
+        title: "Built for real phones, not the demo",
+        detail:
+          "Shimmer skeletons for slow connections, image compression before upload, hand-rolled localisation, and Sentry in production so real crashes were visible — choices for an app used in the field across 20+ countries.",
+      },
+      {
+        title: "Reactive state, not manual refreshes",
+        detail:
+          "Provider and RxDart drive the UI from observable stores, so search, filters, and dashboards update from data changes instead of imperative screen refreshes.",
+      },
+    ],
+    testing: [],
+    tradeoffs: [
+      "This was a front-end role: I built the Flutter and Vue clients against an API and data model owned by the backend developer, not the server itself.",
+      "It predates the test-first discipline in my newer work — the app shipped and scaled on manual QA and production monitoring (Sentry), not an automated suite.",
+      "The app is no longer published, so this case study links an archived 2021 snapshot rather than a live download.",
+    ],
+    nextSteps: [
+      "Add an automated test suite — widget and flow tests around booking and payments especially — instead of leaning on manual QA.",
+      "Migrate the codebase to null-safety and off the now-dated Flutter 1.x packages.",
+      "Pull the per-screen styling into a shared component and design-token system.",
+    ],
+    outcome:
+      "A cross-platform marketplace app and web front end that real tutors and students used — 15,000+ members and 14,000+ transactions across 20+ countries, per 2021 press. It was my first production Flutter app, and the reason I care about discovery, scheduling, and payment flows feeling effortless.",
+    links: [
+      { label: "Archived site (2021)", href: "https://web.archive.org/web/20210624224222/https://myclaaz.com/" },
+      { label: "Press — BusinessToday", href: "https://www.businesstoday.com.my/2021/07/13/myclaaz-com-digital-platform-empowers-trainers-with-numerous-opportunities-for-monetisation/" },
+    ],
+    screenshots: [
+      { src: "/work/myclaaz/01-home.webp", alt: "MyClaaz app home with Student, Tutor, and Business sections", caption: "Home" },
+      { src: "/work/myclaaz/02-search.webp", alt: "Map of Malaysia showing nearby tutors as location pins", caption: "Find a tutor" },
+      { src: "/work/myclaaz/03-profile.webp", alt: "Tutor profile showing services, hourly pricing, and an engage button", caption: "Tutor profile" },
+      { src: "/work/myclaaz/04-schedule.webp", alt: "Weekly tutor availability calendar", caption: "Scheduling" },
     ],
   },
   {

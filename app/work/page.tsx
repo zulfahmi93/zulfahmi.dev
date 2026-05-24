@@ -6,7 +6,7 @@ import { PROJECTS } from "../_data/projects";
 export const metadata: Metadata = {
   title: "Work",
   description:
-    "Projects by Zulfahmi Ahmad, including a Flutter DuitNow payments app, ballot OCR counter, school timetable solver, and receipt renderer.",
+    "Projects by Zulfahmi Ahmad, including a Flutter DuitNow payments app, the MyClaaz tutor marketplace, a ballot OCR counter, a school timetable solver, and a receipt renderer.",
 };
 
 export default function WorkPage() {
@@ -26,7 +26,7 @@ export default function WorkPage() {
       <section className="zf-section tight">
         <div className="zf-container">
           <Reveal>
-            <div className="zf-grid-2">
+            <div className="zf-grid-3">
               {PROJECTS.map((project) => (
                 <ProjectCard key={project.slug} project={project} />
               ))}

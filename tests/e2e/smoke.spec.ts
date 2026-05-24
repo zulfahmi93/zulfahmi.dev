@@ -10,7 +10,7 @@ test.describe("portfolio smoke", () => {
       /people can rely on/i,
     );
     await expect(page.locator(".zf-stack")).toBeVisible();
-    await expect(page.locator(".zf-card")).toHaveCount(2); // two lead projects
+    await expect(page.locator(".zf-card")).toHaveCount(3); // three lead projects
     await expect(page.locator(".zf-stripe")).toBeAttached();
     await expect(page.locator(".zf-footer")).toBeVisible();
   });
@@ -33,7 +33,7 @@ test.describe("portfolio smoke", () => {
 
   test("work grid lists all projects and opens a case study", async ({ page }) => {
     await page.goto("/work");
-    await expect(page.locator(".zf-card")).toHaveCount(4);
+    await expect(page.locator(".zf-card")).toHaveCount(5);
 
     await page.getByRole("link", { name: /DuitNow Payments App/ }).click();
     await expect(page).toHaveURL(/\/work\/duitnow\/?$/);

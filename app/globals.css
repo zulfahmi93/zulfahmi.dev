@@ -1109,6 +1109,8 @@ button.zf-contact-card:hover { border-color: var(--zf-primary); transform: trans
   .zf-caps { grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
   .zf-case-notes { grid-template-columns: 1fr; }
   .zf-tl-item { grid-template-columns: 1fr; gap: 10px; }
+  /* 3-up project grids are cramped in this band; one full-width card per row avoids an orphan. */
+  .zf-grid-2, .zf-grid-3 { grid-template-columns: 1fr; }
 }
 @media (max-width: 820px) {
   .zf-grid-2, .zf-grid-3 { grid-template-columns: 1fr; }

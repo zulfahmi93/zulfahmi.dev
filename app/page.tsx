@@ -54,14 +54,14 @@ export default function HomePage() {
               <p className="zf-eyebrow">Selected work</p>
               <h2 className="zf-section-title">Projects with real constraints</h2>
               <p className="zf-lede">
-                A payments client, an OCR counting pipeline, a timetable solver, and
-                a receipt renderer. Different domains, same habit: make the important
-                parts explicit and testable.
+                A payments client, a tutor marketplace, an OCR counting pipeline, a
+                timetable solver, and a receipt renderer. Different domains, same
+                habit: make the important parts explicit and testable.
               </p>
             </div>
           </Reveal>
           <Reveal delay={1}>
-            <div className="zf-grid-2">
+            <div className="zf-grid-3">
               {LEAD_PROJECTS.map((project) => (
                 <ProjectCard key={project.slug} project={project} />
               ))}
