@@ -815,10 +815,12 @@ button { font-family: inherit; cursor: pointer; }
 }
 .zf-shots {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* always one row — never 3+1 */
+  grid-template-columns: repeat(4, 1fr); /* default; the cols-N class below matches the shot count */
   gap: 16px;
   margin: 0;
 }
+.zf-shots.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.zf-shots.cols-3 { grid-template-columns: repeat(3, 1fr); }
 .zf-shot-trigger {
   display: block;
   width: 100%;
@@ -890,8 +892,14 @@ button { font-family: inherit; cursor: pointer; }
   outline-offset: 3px;
 }
 @media (max-width: 768px) {
-  .zf-shots {
+  .zf-shots,
+  .zf-shots.cols-2,
+  .zf-shots.cols-4 {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .zf-shots.cols-3 {
+    grid-template-columns: 1fr; /* 3 shots stack on mobile — no 2+1 orphan */
     gap: 12px;
   }
 }

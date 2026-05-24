@@ -33,7 +33,7 @@ test.describe("portfolio smoke", () => {
 
   test("work grid lists all projects and opens a case study", async ({ page }) => {
     await page.goto("/work");
-    await expect(page.locator(".zf-card")).toHaveCount(5);
+    await expect(page.locator(".zf-card")).toHaveCount(6);
 
     await page.getByRole("link", { name: /DuitNow Payments App/ }).click();
     await expect(page).toHaveURL(/\/work\/duitnow\/?$/);

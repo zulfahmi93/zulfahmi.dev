@@ -213,6 +213,70 @@ int crc16(List<int> data) {
     ],
   },
   {
+    slug: "enter-sarawak",
+    name: "enterSarawak",
+    tagline: "Three Flutter apps — public, enforcement, and command centre — for Sarawak's COVID-era border-entry approval system.",
+    domain: "Mobile · GovTech",
+    year: "2020–2022",
+    role: "Front-end engineer (Ukuya)",
+    status: "Shipped · archived",
+    lead: true,
+    stack: ["Flutter", "Dart", "Freezed", "Provider", "Hive"],
+    summary: {
+      problem: "During COVID, entering Sarawak meant approval through one mandatory state gate — a single system serving three very different users: travellers, frontline officers, and a command centre.",
+      role: "Front-end engineer, Ukuya — top contributor across the three apps (266 of 499 commits)",
+      result: "Shipped three production Flutter apps that ran the mandatory entry-approval flow end to end — apply, verify at the border, and decide — through the pandemic.",
+    },
+    problem:
+      "When Sarawak controlled its borders during COVID-19, every non-Sarawakian had to be approved before entering. enterSarawak was the state's official system for that — the single mandatory gate for entering the state, run by the State Disaster Management Committee — and it had three sides: the public applies and carries a QR entry pass, enforcement officers verify and process arrivals at entry points, and a command centre reviews and decides. I built the front end at Ukuya — the largest contributor across all three Flutter apps, with 266 of the 499 commits on an eight-person team.",
+    built: [
+      "Built three Flutter apps for the three sides of the system: the public app (apply, upload documents, carry a QR entry pass, track status on a timeline), an officer app to verify and process travellers at entry points, and an admin Command Centre to review and decide applications.",
+      "Generated each approved traveller's QR entry pass with qr_flutter for officers to scan at the border.",
+      "Cached data on-device with Hive and gated access with device biometrics (local_auth), for frontline use on patchy connections.",
+      "Built on a shared in-house Flutter package ecosystem (~24 ukuya_* packages — OAuth, DI, API clients, form fields, validation, i18n, file handling) so the three apps stayed consistent and shipped fast.",
+      "Typed models with Freezed, code-generated routing with auto_route, Provider for state, and Sentry crash reporting in production.",
+    ],
+    decisions: [
+      {
+        title: "One system, three focused apps",
+        detail:
+          "Travellers, officers, and the command centre have completely different jobs, so each got its own app instead of one overloaded build — the public app tuned for applying and carrying a pass, the officer app for fast verification, the admin app for review and decisions.",
+      },
+      {
+        title: "Shared packages, not copy-paste",
+        detail:
+          "The three apps run on a common in-house package set — auth/OAuth, DI, API clients, form fields, validators, i18n — versioned through a private pub server. Shared behaviour lives in one place, so a fix or design change lands across all three apps instead of being copy-pasted into drift.",
+      },
+      {
+        title: "Typed and generated where it counts",
+        detail:
+          "Freezed for typed models and auto_route for generated routing keep a large multi-app codebase — 365+ Dart files across the three apps — navigable, with the compiler catching breakage that would otherwise need a test.",
+      },
+    ],
+    testing: [],
+    tradeoffs: [
+      "Front-end role: I built the three client apps against APIs owned by the backend team; the server side and the approval rules weren't mine.",
+      "Like a lot of pandemic-era software, it shipped fast under real pressure and leaned on production monitoring (Sentry) rather than an automated test suite.",
+      "It was retired when border controls lifted and is no longer on the stores, so this case study points to the SDMC system and press coverage rather than a live download.",
+    ],
+    nextSteps: [
+      "Add automated tests — especially contract tests on the shared packages, so one change can't silently break any of the three apps.",
+      "Add end-to-end flow tests for the apply → verify → approve path across the apps.",
+      "Promote the per-app theming into a single shared design-system layer.",
+    ],
+    outcome:
+      "Three production Flutter apps that carried Sarawak's mandatory border-entry approval through the pandemic — for the public, frontline officers, and a command centre. It's the work that taught me to keep three apps coherent across one repo and a shared package set while shipping under real public-health deadlines.",
+    links: [
+      { label: "About the system — SDMC", href: "https://sarawakdisastermc.com/" },
+      { label: "Press — Malay Mail", href: "https://www.malaymail.com/news/malaysia/2021/10/17/entersarawak-application-required-for-all-non-sarawakians-sdmc-clarifies/2013934" },
+    ],
+    screenshots: [
+      { src: "/work/enter-sarawak/01-applications.webp", alt: "enterSarawak My Applications list showing several travel requests and their approval status", caption: "Applications" },
+      { src: "/work/enter-sarawak/02-submitted.webp", alt: "Travel request submitted confirmation screen", caption: "Request submitted" },
+      { src: "/work/enter-sarawak/03-vaccination.webp", alt: "Adding a COVID-19 vaccination record in the app", caption: "Add vaccination" },
+    ],
+  },
+  {
     slug: "ballot-counter",
     name: "Ballot OCR Counter",
     tagline: "Photos of handwritten ballots into an auditable tally, with rules around the OCR.",
@@ -220,7 +284,7 @@ int crc16(List<int> data) {
     year: "2026",
     role: "Sole engineer",
     status: "In progress",
-    lead: true,
+    lead: false,
     stack: [".NET 10", "Python", "Next.js", "FastAPI", "Gemini", "Supabase"],
     summary: {
       problem: "Handwritten ballots need OCR help, but the model cannot be the final authority.",

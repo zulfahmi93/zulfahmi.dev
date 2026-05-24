@@ -15,7 +15,7 @@ export function ScreenshotGallery({ project }: { project: Project }) {
   if (shots.length === 0) return null;
 
   return (
-    <div className="zf-shots">
+    <div className={`zf-shots cols-${Math.min(shots.length, 4)}`}>
       {shots.map((shot) => (
         <button
           key={shot.src}

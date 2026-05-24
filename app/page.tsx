@@ -54,9 +54,10 @@ export default function HomePage() {
               <p className="zf-eyebrow">Selected work</p>
               <h2 className="zf-section-title">Projects with real constraints</h2>
               <p className="zf-lede">
-                A payments client, a tutor marketplace, an OCR counting pipeline, a
-                timetable solver, and a receipt renderer. Different domains, same
-                habit: make the important parts explicit and testable.
+                A payments client, a statewide border-control system, a tutor
+                marketplace, an OCR counting pipeline, a timetable solver, and a
+                receipt renderer. Different domains, same habit: make the important
+                parts explicit and testable.
               </p>
             </div>
           </Reveal>
