@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 import { Reveal } from "../../_components/reveal";
 import { ArrowRight } from "../../_components/icons";
 import { PROJECTS, getProject } from "../../_data/projects";
@@ -25,6 +26,25 @@ export async function generateMetadata({
   };
 }
 
+function CaseSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="zf-case-section">
+      <h2>{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function CaseList({ items }: { items: string[] }) {
+  return (
+    <ul className="zf-case-list">
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
 export default async function CaseStudyPage({
   params,
 }: {
@@ -36,13 +56,35 @@ export default async function CaseStudyPage({
 
   const index = PROJECTS.findIndex((p) => p.slug === slug);
   const next = PROJECTS[(index + 1) % PROJECTS.length];
+  const isResearch = project.kind === "research";
+  const summary = [
+    { label: "Problem", value: project.summary.problem },
+    { label: "My role", value: project.summary.role },
+    { label: isResearch ? "Status" : "Result", value: project.summary.result },
+  ];
 
   return (
     <>
-      <header className="zf-pagehead">
+      <header className="zf-pagehead zf-case-head">
         <div className="zf-container">
           <p className="zf-eyebrow">{project.domain}</p>
           <h1>{project.name}</h1>
+          <p className="zf-case-tagline">{project.tagline}</p>
+          {project.links && project.links.length > 0 && (
+            <div className="zf-case-actions">
+              {project.links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="zf-btn zf-btn-secondary"
+                >
+                  {link.label} <ArrowRight />
+                </a>
+              ))}
+            </div>
+          )}
           <div className="zf-case-meta">
             <div>
               <span className="k">Role</span>
@@ -66,60 +108,90 @@ export default async function CaseStudyPage({
 
       <section className="zf-section tight">
         <div className="zf-container">
-          <div className="zf-prose">
-            <p className="zf-lede">{project.problem}</p>
-
-            <h2>What I built</h2>
-            <ul>
-              {project.built.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-
-            {project.code && (
-              <figure className="zf-code" style={{ marginBottom: 8 }}>
-                <figcaption className="zf-code-bar">
-                  <span className="lang">{project.code.lang}</span>
-                  <span>{project.code.caption}</span>
-                </figcaption>
-                <pre>
-                  <code>{project.code.body}</code>
-                </pre>
-              </figure>
-            )}
-          </div>
-
-          <div style={{ marginTop: 56 }}>
-            <h2
-              className="zf-section-title"
-              style={{ fontSize: 28, fontWeight: 500, marginBottom: 24 }}
-            >
-              Technical notes
-            </h2>
-            <div className="zf-rigor">
-              {project.rigor.map((point) => (
-                <div className="zf-rigor-item" key={point.title}>
-                  <h4>{point.title}</h4>
-                  <p>{point.detail}</p>
+          <Reveal>
+            <div className="zf-case-summary" aria-label="Project summary">
+              {summary.map((item) => (
+                <div className="zf-case-summary-item" key={item.label}>
+                  <span className="k">{item.label}</span>
+                  <p>{item.value}</p>
                 </div>
               ))}
             </div>
-          </div>
+          </Reveal>
 
-          <div className="zf-prose" style={{ marginTop: 56 }}>
-            <h2>Outcome</h2>
-            <p>{project.outcome}</p>
+          <div className="zf-case-content">
+            <CaseSection title="The problem">
+              <p className="zf-lede">{project.problem}</p>
+            </CaseSection>
+
+            <CaseSection title={isResearch ? "What I've explored" : "What I built"}>
+              <CaseList items={project.built} />
+            </CaseSection>
+
+            <CaseSection title="Key decisions">
+              <div className="zf-case-notes">
+                {project.decisions.map((point) => (
+                  <article className="zf-case-note" key={point.title}>
+                    <h3>{point.title}</h3>
+                    <p>{point.detail}</p>
+                  </article>
+                ))}
+              </div>
+            </CaseSection>
+
+            {project.testing.length > 0 && (
+              <CaseSection title="Checks and tests">
+                <CaseList items={project.testing} />
+              </CaseSection>
+            )}
+
+            {project.codeSamples && project.codeSamples.length > 0 && (
+              <CaseSection
+                title={project.codeSamples.length > 1 ? "Code samples" : "Code sample"}
+              >
+                <div className="zf-code-stack">
+                  {project.codeSamples.map((sample) => (
+                    <figure className="zf-code" key={`${sample.lang}-${sample.caption}`}>
+                      <figcaption className="zf-code-bar">
+                        <span className="lang">{sample.lang}</span>
+                        <span>{sample.caption}</span>
+                      </figcaption>
+                      <pre>
+                        <code>{sample.body}</code>
+                      </pre>
+                    </figure>
+                  ))}
+                </div>
+              </CaseSection>
+            )}
+
+            <CaseSection title="Trade-offs">
+              <CaseList items={project.tradeoffs} />
+            </CaseSection>
+
+            <CaseSection title={isResearch ? "Where it's heading" : "Result"}>
+              <p>{project.outcome}</p>
+            </CaseSection>
+
+            <CaseSection title={isResearch ? "What's next" : "What I would improve next"}>
+              <CaseList items={project.nextSteps} />
+            </CaseSection>
           </div>
 
           <Reveal>
-            <Link href={`/work/${next.slug}`} className="zf-case-next">
-              <span>
-                <span className="k">Next project</span>
-                <br />
-                <span className="v">{next.name}</span>
-              </span>
-              <ArrowRight />
-            </Link>
+            <nav className="zf-case-nav" aria-label="Case study navigation">
+              <Link href="/work" className="zf-case-back">
+                All work
+              </Link>
+              <Link href={`/work/${next.slug}`} className="zf-case-next">
+                <span>
+                  <span className="k">Next project</span>
+                  <br />
+                  <span className="v">{next.name}</span>
+                </span>
+                <ArrowRight />
+              </Link>
+            </nav>
           </Reveal>
         </div>
       </section>

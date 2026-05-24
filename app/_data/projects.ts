@@ -1,9 +1,17 @@
 // Single source of truth for the project showcase.
 // Used by /work (grid) and /work/[slug] (case study). No employer branding.
 
-export type RigorPoint = { title: string; detail: string };
+export type CasePoint = { title: string; detail: string };
 
 export type CodeSample = { lang: string; caption: string; body: string };
+
+export type ProjectLink = { label: string; href: string };
+
+export type ProjectSummary = {
+  problem: string;
+  role: string;
+  result: string;
+};
 
 export type Project = {
   slug: string;
@@ -15,18 +23,30 @@ export type Project = {
   year: string;
   role: string;
   status: string;
+  /** "build" (default) uses shipped-work headings; "research" uses design/discovery framing. */
+  kind?: "build" | "research";
   /** Featured on the homepage when true. */
   lead: boolean;
   stack: string[];
+  /** Compact summary cards near the top of the case-study page. */
+  summary: ProjectSummary;
   /** Editorial lede on the case-study page. */
   problem: string;
   /** What I built — scope bullets. */
   built: string[];
-  /** Technical notes for the case-study page. */
-  rigor: RigorPoint[];
+  /** Key implementation decisions for the case-study page. */
+  decisions: CasePoint[];
+  /** Tests, checks, and review steps worth calling out. */
+  testing: string[];
+  /** Trade-offs that make the case study more honest. */
+  tradeoffs: string[];
+  /** What I would improve next. */
+  nextSteps: string[];
   outcome: string;
-  /** Optional illustrative code sample. */
-  code?: CodeSample;
+  /** Optional public artifacts. */
+  links?: ProjectLink[];
+  /** Optional illustrative code samples. */
+  codeSamples?: CodeSample[];
 };
 
 export const PROJECTS: Project[] = [
@@ -40,19 +60,24 @@ export const PROJECTS: Project[] = [
     status: "Demo · complete",
     lead: true,
     stack: ["Flutter", "Dart", "Riverpod", "Freezed", "local_auth"],
+    summary: {
+      problem: "Payment flows need exact QR parsing, strict input checks, and clear confirmation before money moves.",
+      role: "Sole Flutter engineer",
+      result: "Demo complete with biometric gating before every sensitive action, and 71 tests.",
+    },
     problem:
       "DuitNow QR and DuitNow Transfer leave little room for guesswork: the QR payload has to match EMVCo rules, and every payment screen has to treat money and identity carefully. I built a working Flutter client over one night as a focused payments exercise.",
     built: [
       "Scan a DuitNow QR, parse the EMVCo payload, verify the checksum, then show a confirmation before any debit.",
       "Send DuitNow transfers by account, phone number (E.164), or national ID, with bank-specific account rules.",
       "Require Face ID, fingerprint, or device PIN before sensitive actions.",
-      "Block screenshots on payment screens and keep error messages deliberately non-revealing.",
+      "Keep error messages on payment screens deliberately non-revealing.",
     ],
-    rigor: [
+    decisions: [
       {
-        title: "Hand-checked QR fixtures",
+        title: "Validate before the payment flow",
         detail:
-          "The parser is tested against CRC16-CCITT-FALSE checksums I calculated manually: 39 parser tests and 66 tests overall. A QR code only moves forward after its checksum passes.",
+          "QR payloads, MyKad values, phone numbers, and bank account formats are checked before the app reaches the confirmation screen.",
       },
       {
         title: "Typed failures",
@@ -60,17 +85,33 @@ export const PROJECTS: Project[] = [
           "Fallible paths return sealed Result / Failure types, so errors stay explicit. There is no exception-driven control flow and no untyped `as` casts in the codebase.",
       },
       {
-        title: "Boundary validation",
+        title: "Keep payment screens narrow",
         detail:
-          "MyKad, E.164 phone numbers, and bank account formats are checked before input reaches the payment flow.",
+          "Sensitive screens require biometrics or device PIN before they act, and avoid error messages that reveal too much.",
       },
+    ],
+    testing: [
+      "40 parser tests cover EMVCo payload parsing and CRC16-CCITT-FALSE verification, including a real bank QR payload.",
+      "I calculated checksum fixtures manually so the parser is tested against known-good values.",
+      "Validators cover MyKad, E.164 phone numbers, and bank-specific account formats.",
+      "The full suite has 71 tests across parsing, validation, failure handling, and payment flow logic.",
+    ],
+    tradeoffs: [
+      "I kept this as a demo client instead of implying access to live banking rails.",
+      "Payment-screen errors are intentionally bland; detailed failure reasons stay inside typed failures and tests.",
+    ],
+    nextSteps: [
+      "Wire the native screenshot block (Android FLAG_SECURE / iOS) — the Dart guard is in place, but the platform side is still stubbed.",
+      "Add mocked bank adapters so transfer states can be exercised end to end.",
+      "Add receipt and transaction-history screens without widening the sensitive surface area.",
     ],
     outcome:
       "A complete, test-backed payments client showing how I approach money movement: validate early, keep sensitive paths narrow, and make failures explicit.",
-    code: {
-      lang: "dart",
-      caption: "EMVCo CRC16-CCITT-FALSE, checked against manual fixtures",
-      body: `/// Every EMVCo QR payload ends with a CRC16-CCITT-FALSE checksum
+    codeSamples: [
+      {
+        lang: "dart",
+        caption: "EMVCo CRC16-CCITT-FALSE, checked against manual fixtures",
+        body: `/// Every EMVCo QR payload ends with a CRC16-CCITT-FALSE checksum
 /// over the preceding bytes, including the "6304" tag and length.
 /// We recompute it and refuse to parse a code whose checksum is wrong.
 int crc16(List<int> data) {
@@ -84,7 +125,8 @@ int crc16(List<int> data) {
   }
   return crc;
 }`,
-    },
+      },
+    ],
   },
   {
     slug: "ballot-counter",
@@ -95,7 +137,12 @@ int crc16(List<int> data) {
     role: "Sole engineer",
     status: "In progress",
     lead: true,
-    stack: ["Python", "FastAPI", "PostgreSQL", "Gemini", "Docker"],
+    stack: [".NET 10", "Python", "Next.js", "FastAPI", "Gemini", "Supabase"],
+    summary: {
+      problem: "Handwritten ballots need OCR help, but the model cannot be the final authority.",
+      role: "Sole engineer",
+      result: "MVP built: roster checks, four-tier name matching, and tests against a real PostgreSQL.",
+    },
     problem:
       "Manual counts take time, and children's handwriting on Malay-language ballots is a rough case for OCR. This project turns ballot photos into a tally, but it doesn't ask the model to be the final source of truth.",
     built: [
@@ -103,22 +150,35 @@ int crc16(List<int> data) {
       "Run the web app, API, OCR worker, and PostgreSQL with Docker so the whole stack is repeatable.",
       "Check group eligibility against a seeded roster before a vote is counted.",
     ],
-    rigor: [
+    decisions: [
       {
-        title: "Test against PostgreSQL",
+        title: "Model as extractor",
         detail:
-          "pgTAP and Testcontainers run the tests against a real PostgreSQL instance, with state reset between tests. I avoided ORM mocks here because the database rules matter.",
+          "Gemini reads the handwriting and suggests a name; a four-tier matcher (exact, accent-folded, fuzzy, phonetic) plus the eligibility and counting rules all run outside the model.",
       },
       {
-        title: "Security passes",
+        title: "Database rules matter",
         detail:
-          "I did separate reviews for untrusted image uploads and data isolation, each with a short threat model.",
+          "The tally depends on seeded rosters, eligibility checks, and stored state, so the tests run against PostgreSQL rather than mocks.",
       },
       {
-        title: "Synthetic fixtures",
+        title: "Real fixtures stay out of git",
         detail:
-          "The repo doesn't need real ballot images or voter data. Test images and roster data are synthetic, and the pipeline is designed around that constraint.",
+          "Test ballot photos and roster images are real, but git-ignored and never committed, so no real voter data lands in the repo.",
       },
+    ],
+    testing: [
+      "110 pgTAP assertions plus a Testcontainers suite exercise a real PostgreSQL instance, with state reset between tests — no ORM mocks.",
+      "Seeded rosters cover eligible, ineligible, duplicate, and wrong-group vote cases.",
+      "The upload path checks JPEG magic bytes, caps body size, and rejects open redirects; every endpoint sits behind Supabase JWT auth.",
+    ],
+    tradeoffs: [
+      "I chose an auditable pipeline over a one-shot OCR answer, even though it adds more moving parts.",
+      "Low-confidence extraction should go to review rather than being silently counted.",
+    ],
+    nextSteps: [
+      "Add a human review queue for low-confidence OCR results.",
+      "Add batch import/export so a full voting session can be checked outside the app.",
     ],
     outcome:
       "An OCR counting pipeline where AI helps with extraction, while eligibility rules, database constraints, and checks decide what gets counted.",
@@ -126,34 +186,55 @@ int crc16(List<int> data) {
   {
     slug: "susun-jadual",
     name: "School Timetable Solver",
-    tagline: "School timetables generated by a constraint solver, with AI only for rule capture.",
+    tagline: "Research toward school timetabling as a constraint problem — not something to hand an LLM.",
     domain: "AI · Optimization",
     year: "2026",
     role: "Sole engineer",
-    status: "In progress",
+    status: "Research · ongoing",
+    kind: "research",
     lead: false,
-    stack: [".NET", "Python", "OR-Tools", "PostgreSQL", "Docker"],
+    stack: ["OR-Tools", "Python", ".NET", "Supabase"],
+    summary: {
+      problem: "School timetables are a constraint problem, not something an LLM should guess.",
+      role: "Solo — research and design",
+      result: "Ongoing: interviewing teachers and designing the solver before writing the first line of solver code.",
+    },
     problem:
-      "Schools often buy timetable tools they only use a few times a year. The hard part is avoiding clashes across teachers, rooms, classes, and rules. That is a constraint problem, so the timetable is solved by OR-Tools instead of guessed by an LLM.",
+      "Schools often buy timetable tools they only use a few times a year. The hard part is avoiding clashes across teachers, rooms, classes, and rules. That is a constraint problem — so the plan is to solve it with an OR-Tools CP-SAT solver, not guess it with an LLM that cannot guarantee a clash-free result.",
     built: [
-      "Let teachers describe constraints in natural language, then translate them into structured rules.",
-      "Use OR-Tools CP-SAT to generate the timetable from those rules.",
-      "Run a separate validator over the generated timetable before showing it.",
+      "Interviewing teachers to learn how Malaysian schools actually build timetables today, and where the current tools hurt.",
+      "Researched the market and the KSSR curriculum hour rules (for example, Bahasa Melayu at 11 periods a week in Year 4) so the model is grounded in real requirements.",
+      "Designed the system end to end — CP-SAT solver, an independent verifier, and plain-language conflict explanations — in a plan that went through three separate design-review passes.",
     ],
-    rigor: [
+    decisions: [
       {
         title: "LLM stays in its lane",
         detail:
-          "The model only helps turn text into structured constraints. The schedule comes from a deterministic CP-SAT solver, and the product copy says that plainly.",
+          "The model is only meant to turn plain-language constraints into structure. The timetable itself will come from a deterministic CP-SAT solver — and the product copy will say so plainly.",
       },
       {
-        title: "Independent validation",
+        title: "Solver chosen for its licence, too",
         detail:
-          "After solving, a separate validator checks the timetable against the full rule set. The app doesn't rely on the solver's feasibility result alone.",
+          "OR-Tools (Apache-2.0) is the planned solver over strong alternatives like FET, whose AGPL licence would force the whole product open-source.",
+      },
+      {
+        title: "Verify independently of the solver",
+        detail:
+          "The design calls for a separate verifier that re-checks every timetable against the full rule set, rather than trusting the solver's own feasibility result.",
       },
     ],
+    testing: [],
+    tradeoffs: [
+      "An LLM cannot create the timetable. If a teacher's rule cannot be structured clearly, it needs clarification rather than a guess.",
+      "A constraint solver is less 'magical' than an LLM, but it can guarantee no clashes and explain exactly why a schedule is impossible.",
+    ],
+    nextSteps: [
+      "Turn the teacher interviews into a first concrete constraint set to model against.",
+      "Build the CP-SAT solver and the independent verifier as the first coding milestone, test-first.",
+      "Validate generated timetables with a pilot school before widening the scope.",
+    ],
     outcome:
-      "A practical scheduling prototype that combines natural-language input with a deterministic solver and a plain-spoken explanation of what the AI does.",
+      "A scheduling tool grounded in how schools really work, honest about using a solver — not an LLM — for the part that has to be correct. The research phase is shaping what gets built first.",
   },
   {
     slug: "receipt-maker",
@@ -165,31 +246,60 @@ int crc16(List<int> data) {
     status: "Shipped",
     lead: false,
     stack: [".NET 10", "SkiaSharp", "QRCoder", "xUnit"],
+    summary: {
+      problem: "Receipts need exact totals and matching output across PDF, PNG, and SVG.",
+      role: "Sole engineer",
+      result: "Shipped renderer with a shared core, golden-image tests, and architecture notes.",
+    },
     problem:
       "Receipts sound simple until totals, taxes, logos, fonts, and different output formats all have to match. I built a renderer that keeps the math exact and the visual output stable across servers.",
     built: [
       "Validate the JSON, render once with SkiaSharp, then write the same receipt through PDF, PNG, and SVG backends.",
-      "Expose the same rendering core through a CLI, an HTTP API, and a bot.",
+      "Expose the same rendering core through a CLI, an HTTP API, and a Telegram bot, with a Flutter macOS demo on top.",
     ],
-    rigor: [
+    decisions: [
       {
-        title: "Decimal money throughout",
+        title: "Render once, write many",
+        detail:
+          "The renderer builds one receipt layout, then sends it through PDF, PNG, and SVG backends so the formats stay aligned.",
+      },
+      {
+        title: "Decimal money",
         detail:
           "Amounts use `decimal` with explicit away-from-zero rounding from input parsing to the rendered total. No floating point is used for currency.",
       },
       {
-        title: "Stable output in CI",
-        detail:
-          "Time comes from an `IClock`, and golden-image tests run on Linux in CI so rendering changes are caught instead of drifting silently.",
-      },
-      {
         title: "Self-contained rendering",
         detail:
-          "Logos and fonts are embedded rather than fetched at render time, which avoids SSRF risk and keeps output reproducible. Compiler warnings fail the build.",
+          "Logos and fonts are embedded rather than fetched at render time, which avoids SSRF risk and keeps output reproducible.",
       },
+    ],
+    testing: [
+      "184 tests on macOS (186 in Linux CI), plus 30 Flutter widget tests on the demo app.",
+      "Golden-image tests run on Linux in CI so visual drift is caught during review.",
+      "Time comes from an `IClock`, which keeps generated receipts deterministic.",
+      "Compiler warnings fail the build, and four ADRs document the main trade-offs.",
+    ],
+    tradeoffs: [
+      "Embedding fonts and logos reduces runtime flexibility, but it makes output reproducible and removes remote fetch risk.",
+      "The renderer prioritises deterministic layout over browser-style flowing HTML.",
+    ],
+    nextSteps: [
+      "Add more receipt templates without changing the money and rendering contracts.",
+      "Add a visual diff review page for template changes.",
     ],
     outcome:
       "A small rendering toolkit with the boring parts handled properly: exact money, stable output, and architecture notes explaining the main decisions.",
+    codeSamples: [
+      {
+        lang: "csharp",
+        caption: "Money stays decimal until it is rendered",
+        body: `decimal RoundMoney(decimal amount)
+{
+    return Math.Round(amount, 2, MidpointRounding.AwayFromZero);
+}`,
+      },
+    ],
   },
 ];
 

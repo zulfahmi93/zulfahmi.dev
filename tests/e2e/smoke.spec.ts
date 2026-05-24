@@ -38,7 +38,9 @@ test.describe("portfolio smoke", () => {
     await page.getByRole("link", { name: /DuitNow Payments App/ }).click();
     await expect(page).toHaveURL(/\/work\/duitnow\/?$/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(/DuitNow/);
-    await expect(page.getByText("Technical notes")).toBeVisible();
+    await expect(page.getByText("Key decisions")).toBeVisible();
+    await expect(page.getByText("Checks and tests")).toBeVisible();
+    await expect(page.getByText("What I would improve next")).toBeVisible();
   });
 
   test("résumé opens in a viewer dialog with a download action", async ({ page }) => {
