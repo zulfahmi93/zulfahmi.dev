@@ -813,6 +813,98 @@ button { font-family: inherit; cursor: pointer; }
   height: 2px;
   background: var(--zf-primary);
 }
+.zf-shots {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* always one row — never 3+1 */
+  gap: 16px;
+  margin: 0;
+}
+.zf-shot-trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 20px;
+}
+.zf-shot-frame {
+  position: relative;
+  display: block;
+}
+.zf-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 540 / 1170;
+  object-fit: cover;
+  border-radius: 18px;
+  border: 1px solid var(--zf-hairline);
+  box-shadow: 0 14px 34px -16px rgba(20, 30, 45, 0.28);
+  background: var(--zf-canvas);
+  transition: transform 220ms var(--zf-ease), box-shadow 220ms var(--zf-ease),
+    border-color 220ms var(--zf-ease);
+}
+.zf-shot-badge {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--zf-ink);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 200ms var(--zf-ease), transform 200ms var(--zf-ease);
+}
+.zf-shot-badge svg {
+  width: 15px;
+  height: 15px;
+}
+.zf-shot-cap {
+  display: block;
+  margin: 10px 2px 0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--zf-stone);
+}
+.zf-shot-trigger:hover .zf-shot,
+.zf-shot-trigger:focus-visible .zf-shot {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px -16px rgba(20, 30, 45, 0.34);
+  border-color: var(--zf-beige-deep);
+}
+.zf-shot-trigger:hover .zf-shot-badge,
+.zf-shot-trigger:focus-visible .zf-shot-badge {
+  opacity: 1;
+  transform: none;
+}
+.zf-shot-trigger:focus-visible {
+  outline: 2px solid var(--zf-primary-deep);
+  outline-offset: 3px;
+}
+@media (max-width: 768px) {
+  .zf-shots {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zf-shot,
+  .zf-shot-badge {
+    transition: none;
+  }
+  .zf-shot-trigger:hover .zf-shot,
+  .zf-shot-trigger:focus-visible .zf-shot {
+    transform: none;
+  }
+}
 .zf-case-notes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

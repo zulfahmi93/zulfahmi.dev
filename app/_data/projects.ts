@@ -7,6 +7,8 @@ export type CodeSample = { lang: string; caption: string; body: string };
 
 export type ProjectLink = { label: string; href: string };
 
+export type Screenshot = { src: string; alt: string; caption: string };
+
 export type ProjectSummary = {
   problem: string;
   role: string;
@@ -47,6 +49,8 @@ export type Project = {
   links?: ProjectLink[];
   /** Optional illustrative code samples. */
   codeSamples?: CodeSample[];
+  /** Optional app screenshots, shown as a gallery row on the case study. */
+  screenshots?: Screenshot[];
 };
 
 export const PROJECTS: Project[] = [
@@ -126,6 +130,12 @@ int crc16(List<int> data) {
   return crc;
 }`,
       },
+    ],
+    screenshots: [
+      { src: "/work/duitnow/01-home.webp", alt: "Home dashboard with account balance and quick actions", caption: "Home" },
+      { src: "/work/duitnow/02-send.webp", alt: "Choosing how to identify a DuitNow transfer recipient", caption: "Send" },
+      { src: "/work/duitnow/03-confirm.webp", alt: "Payment review screen with recipient, amount, and a biometric confirm button", caption: "Confirm" },
+      { src: "/work/duitnow/04-success.webp", alt: "Successful payment receipt with reference number", caption: "Success" },
     ],
   },
   {

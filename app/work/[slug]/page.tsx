@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Reveal } from "../../_components/reveal";
 import { ArrowRight } from "../../_components/icons";
+import { ScreenshotGallery } from "../../_components/screenshot-gallery";
 import { PROJECTS, getProject } from "../../_data/projects";
 
 export const dynamicParams = false;
@@ -123,6 +124,12 @@ export default async function CaseStudyPage({
             <CaseSection title="The problem">
               <p className="zf-lede">{project.problem}</p>
             </CaseSection>
+
+            {project.screenshots && project.screenshots.length > 0 && (
+              <CaseSection title="A look at the app">
+                <ScreenshotGallery project={project} />
+              </CaseSection>
+            )}
 
             <CaseSection title={isResearch ? "What I've explored" : "What I built"}>
               <CaseList items={project.built} />
