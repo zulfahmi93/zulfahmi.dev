@@ -5,14 +5,16 @@ export const SITE = {
   name: "Zulfahmi", // short wordmark
   fullName: "Zulfahmi Ahmad",
   role: "Senior Software Engineer",
-  location: "Malaysia",
+  location: "Sungai Udang, Melaka",
   domain: "zulfahmi.dev",
   url: "https://zulfahmi.dev",
   positioning:
     "I build mobile, web, and AI-backed systems for teams that need to ship quickly and keep things running.",
-  email: "zulfahmi93@outlook.com",
+  email: "hello@zulfahmi.dev",
   resume: "/zulfahmi-cv.pdf",
   portrait: "/portrait.jpg",
+  // Town-level locator shown decoratively in the hero + footer.
+  coords: { lat: "N 2°17.56′", lon: "E 102°7.99′" },
   socials: {
     github: "https://github.com/zulfahmi93",
     linkedin: "https://www.linkedin.com/in/zulfahmi-ahmad/",
@@ -21,6 +23,7 @@ export const SITE = {
 } as const;
 
 export const NAV: { label: string; href: string }[] = [
+  { label: "Home", href: "/" },
   { label: "Work", href: "/work" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },

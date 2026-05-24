@@ -1,0 +1,10 @@
+name = "zulfahmi-contact-relay"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+
+# Public, non-secret config. RESEND_API_KEY is set separately as a secret:
+#   wrangler secret put RESEND_API_KEY
+[vars]
+ALLOWED_ORIGIN = "https://zulfahmi.dev"
+FROM_EMAIL = "Portfolio <portfolio@zulfahmi.dev>"
+TO_EMAIL = "hello@zulfahmi.dev"

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "../_components/reveal";
+import { HeroOrbs } from "../_components/hero-orbs";
 import { ArrowRight } from "../_components/icons";
 import { CredentialButton, ResumeTrigger } from "../_components/credential-triggers";
 import {
@@ -8,7 +9,6 @@ import {
   CERTIFICATIONS,
   EDUCATION,
   EXPERIENCE,
-  PRINCIPLES,
   SITE,
   STATS,
 } from "../_data/site";
@@ -16,31 +16,38 @@ import {
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Zulfahmi Ahmad is a senior software engineer in Malaysia who leads a Flutter team and builds mobile, web, backend, and AI-assisted systems.",
+    "Zulfahmi Ahmad is a senior software engineer in Sungai Udang, Melaka who leads a Flutter team and builds mobile, web, backend, and AI-assisted systems.",
 };
 
 export default function AboutPage() {
   return (
     <>
       <header className="zf-pagehead">
-        <div className="zf-container">
+        <HeroOrbs variant="soft" />
+        <div className="zf-container zf-pagehead-inner">
           <p className="zf-eyebrow">About</p>
-          <h1>Hi, I&rsquo;m {SITE.name}.</h1>
+          <h1>
+            Hi, I&rsquo;m <span className="ital">{SITE.name}.</span>
+          </h1>
         </div>
       </header>
 
-      {/* Intro: portrait + bio */}
       <section className="zf-section tight">
         <div className="zf-container">
+          {/* Intro: portrait + bio */}
           <div className="zf-about-intro">
-            <div className="zf-portrait">
+            <div className="zf-portrait-arch">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={SITE.portrait}
                 alt={`Portrait of ${SITE.fullName}`}
                 width={720}
-                height={899}
+                height={900}
               />
+              <div className="zf-portrait-tag">
+                <span className="dot" aria-hidden="true" />
+                {SITE.location}
+              </div>
             </div>
             <div className="zf-prose">
               <p className="zf-lede">
@@ -61,7 +68,7 @@ export default function AboutPage() {
                 scheduling, rendering. They force you to be clear about rules, failure
                 modes, and what AI should or should not decide.
               </p>
-              <div className="zf-hero-cta" style={{ marginTop: 28 }}>
+              <div className="zf-hero-cta">
                 <ResumeTrigger className="zf-btn zf-btn-primary">
                   View résumé <ArrowRight />
                 </ResumeTrigger>
@@ -71,31 +78,39 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Stats */}
-      <section className="zf-section tight">
-        <div className="zf-container">
+          {/* Stats */}
           <div className="zf-stats">
-            {STATS.map((stat) => (
-              <div className="zf-stat" key={stat.label}>
-                <span className="num">{stat.value}</span>
-                <span className="label">{stat.label}</span>
-              </div>
-            ))}
+            {STATS.map((stat) => {
+              const m = stat.value.match(/^(\d+)(.*)$/);
+              return (
+                <div className="zf-stat" key={stat.label}>
+                  <span className="num">
+                    {m ? m[1] : stat.value}
+                    {m && m[2] && <em>{m[2]}</em>}
+                  </span>
+                  <span className="label">{stat.label}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Experience */}
-      <section className="zf-section soft">
+      <section className="zf-section tight">
         <div className="zf-container">
           <Reveal>
-            <div className="zf-section-head">
-              <p className="zf-eyebrow">Experience</p>
-              <h2 className="zf-section-title">Places I&rsquo;ve worked</h2>
-            </div>
+            <header className="zf-numhead">
+              <div className="num">01</div>
+              <h2>
+                Places I&rsquo;ve <span className="ital">worked</span>
+              </h2>
+              <p className="lede">
+                A decade of mobile, backend, and research — shipping in production
+                environments where small mistakes were expensive.
+              </p>
+            </header>
           </Reveal>
           <Reveal delay={1}>
             <ol className="zf-timeline">
@@ -120,37 +135,19 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* How I work */}
-      <section className="zf-section tight">
-        <div className="zf-container">
-          <Reveal>
-            <div className="zf-section-head">
-              <p className="zf-eyebrow">How I work</p>
-              <h2 className="zf-section-title">Habits I bring to the work</h2>
-            </div>
-          </Reveal>
-          <Reveal delay={1}>
-            <div className="zf-values">
-              {PRINCIPLES.map((principle, i) => (
-                <div className="zf-value" key={principle.title}>
-                  <div className="zf-value-num">{String(i + 1).padStart(2, "0")}</div>
-                  <h3>{principle.title}</h3>
-                  <p>{principle.body}</p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
       {/* Capabilities */}
       <section className="zf-section soft tight">
         <div className="zf-container">
           <Reveal>
-            <div className="zf-section-head">
-              <p className="zf-eyebrow">Capabilities</p>
-              <h2 className="zf-section-title">Tools I use often</h2>
-            </div>
+            <header className="zf-numhead">
+              <div className="num">02</div>
+              <h2>
+                Tools I <span className="ital">use</span> often
+              </h2>
+              <p className="lede">
+                Stack I reach for. Not a complete list — the ones that earn their seat.
+              </p>
+            </header>
           </Reveal>
           <Reveal delay={1}>
             <div className="zf-caps">
@@ -172,15 +169,26 @@ export default function AboutPage() {
       {/* Education + certifications */}
       <section className="zf-section tight">
         <div className="zf-container">
+          <Reveal>
+            <header className="zf-numhead">
+              <div className="num">03</div>
+              <h2>
+                On <span className="ital">paper</span>
+              </h2>
+              <p className="lede">Formal credentials — the official ones at least.</p>
+            </header>
+          </Reveal>
           <div className="zf-creds">
             <div>
               <h4 className="zf-creds-h">Education</h4>
               {EDUCATION.map((ed) => (
                 <div className="zf-cred-row" key={ed.title}>
-                  <span className="t">{ed.title}</span>
-                  <span className="m">
-                    {ed.org} · {ed.location}
-                  </span>
+                  <div>
+                    <span className="t">{ed.title}</span>
+                    <span className="m">
+                      {ed.org} · {ed.location}
+                    </span>
+                  </div>
                   <span className="y">{ed.period}</span>
                 </div>
               ))}
@@ -202,12 +210,14 @@ export default function AboutPage() {
         <div className="zf-container">
           <Reveal>
             <div className="zf-cta-band">
-              <h2>Want to talk through the work?</h2>
+              <h2>
+                Want to <span className="ital">talk</span> through the work?
+              </h2>
               <p>I&rsquo;m happy to share more context, walk through code, or discuss a role.</p>
               <div className="zf-cta-row">
-                <a href={`mailto:${SITE.email}`} className="zf-btn zf-btn-primary">
-                  Email me <ArrowRight />
-                </a>
+                <Link href="/contact" className="zf-btn zf-btn-primary">
+                  Get in touch <ArrowRight />
+                </Link>
                 <Link href="/work" className="zf-btn zf-btn-secondary">
                   See the work
                 </Link>

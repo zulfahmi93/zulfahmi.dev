@@ -21,50 +21,51 @@ export function SiteFooter() {
           <div className="zf-footer-inner">
             <div className="zf-footer-brand">
               <div className="name">
-                {SITE.name}
-                <span className="dot">.</span>
+                zulfahmi<span className="dot">.</span>dev
               </div>
-              <p>{SITE.positioning}</p>
+              <p>Built for people who want careful engineering, not theatre.</p>
             </div>
 
-            <div className="zf-footer-nav">
-              <div className="zf-footer-col">
-                <h4>Pages</h4>
-                <ul>
-                  {NAV.map((item) => (
-                    <li key={item.href}>
-                      <Link href={item.href}>{item.label}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <div className="zf-footer-col">
+              <h4>Site</h4>
+              <ul>
+                {NAV.map((item) => (
+                  <li key={item.href}>
+                    <Link href={item.href}>{item.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-              <div className="zf-footer-col">
-                <h4>Elsewhere</h4>
-                <ul>
-                  <li>
-                    <a href={`mailto:${SITE.email}`}>Email</a>
+            <div className="zf-footer-col">
+              <h4>Elsewhere</h4>
+              <ul>
+                {socials.map((s) => (
+                  <li key={s.label}>
+                    <a href={s.href} target="_blank" rel="noopener noreferrer">
+                      {s.label}
+                    </a>
                   </li>
-                  {socials.map((s) => (
-                    <li key={s.label}>
-                      <a href={s.href} target="_blank" rel="noopener noreferrer">
-                        {s.label}
-                      </a>
-                    </li>
-                  ))}
-                  <li>
-                    <ResumeTrigger className="zf-footer-linkbtn">Résumé</ResumeTrigger>
-                  </li>
-                </ul>
-              </div>
+                ))}
+                <li>
+                  <a href={`mailto:${SITE.email}`}>Email</a>
+                </li>
+                <li>
+                  <ResumeTrigger className="zf-footer-linkbtn">Résumé</ResumeTrigger>
+                </li>
+              </ul>
             </div>
           </div>
 
           <div className="zf-footer-bottom">
             <span>
-              © {new Date().getFullYear()} {SITE.name}
+              © {new Date().getFullYear()} · {SITE.fullName}
             </span>
-            <span>{SITE.domain}</span>
+            <div className="zf-footer-coords">
+              <span>{SITE.location}</span>
+              <span>{SITE.coords.lat}</span>
+              <span>{SITE.coords.lon}</span>
+            </div>
           </div>
         </div>
       </footer>

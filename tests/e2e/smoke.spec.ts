@@ -6,12 +6,12 @@ test.describe("portfolio smoke", () => {
   test("home renders the key sections", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle(/Zulfahmi/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      /people can rely on/i,
-    );
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/rely on/i);
     await expect(page.locator(".zf-stack")).toBeVisible();
-    await expect(page.locator(".zf-card")).toHaveCount(3); // three lead projects
-    await expect(page.locator(".zf-stripe")).toBeAttached();
+    // Featured project (DuitNow) + two secondary lead cards.
+    await expect(page.getByRole("heading", { name: /DuitNow Payments App/ })).toBeVisible();
+    await expect(page.locator(".zf-card")).toHaveCount(2);
+    await expect(page.locator(".zf-stripe").first()).toBeAttached();
     await expect(page.locator(".zf-footer")).toBeVisible();
   });
 
@@ -21,7 +21,7 @@ test.describe("portfolio smoke", () => {
 
     await nav.getByRole("link", { name: "Work" }).click();
     await expect(page).toHaveURL(/\/work\/?$/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(/Projects/i);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(/projects/i);
 
     await nav.getByRole("link", { name: "About" }).click();
     await expect(page).toHaveURL(/\/about\/?$/);
@@ -31,9 +31,25 @@ test.describe("portfolio smoke", () => {
     await expect(page.getByText(SITE.email)).toBeVisible();
   });
 
+  test("theme toggle switches the document theme and persists", async ({ page }) => {
+    await page.goto("/");
+    const html = page.locator("html");
+    const toggle = page.locator(".zf-theme-toggle");
+
+    // Default (no stored mode, light OS preference) resolves to light.
+    await expect(html).toHaveAttribute("data-theme", "light");
+    await toggle.click(); // auto -> light
+    await toggle.click(); // light -> dark
+    await expect(html).toHaveAttribute("data-theme", "dark");
+
+    // The choice survives a reload via localStorage + the pre-paint script.
+    await page.reload();
+    await expect(html).toHaveAttribute("data-theme", "dark");
+  });
+
   test("work grid lists all projects and opens a case study", async ({ page }) => {
     await page.goto("/work");
-    await expect(page.locator(".zf-card")).toHaveCount(6);
+    await expect(page.locator(".zf-work-card")).toHaveCount(6);
 
     await page.getByRole("link", { name: /DuitNow Payments App/ }).click();
     await expect(page).toHaveURL(/\/work\/duitnow\/?$/);
@@ -52,6 +68,15 @@ test.describe("portfolio smoke", () => {
     await expect(viewer).toBeHidden();
   });
 
+  test("contact form validates before sending", async ({ page }) => {
+    await page.goto("/contact");
+    await expect(page.locator("#cf-name")).toBeVisible();
+    await page.getByRole("button", { name: /Send message/i }).click();
+    // Submitting empty surfaces inline errors rather than navigating away.
+    await expect(page.getByText("Tell me who you are.")).toBeVisible();
+    await expect(page.getByText("I need somewhere to write back.")).toBeVisible();
+  });
+
   test("résumé opens in a viewer dialog with a download action", async ({ page }) => {
     await page.goto("/about");
     const dialog = page.locator("dialog.zf-viewer");
@@ -64,7 +89,6 @@ test.describe("portfolio smoke", () => {
       dialog.getByRole("link", { name: /Download PDF/i }),
     ).toHaveAttribute("href", /zulfahmi-cv\.pdf$/);
 
-    // The open modal itself must be accessible, not just the page behind it.
     const axe = await new AxeBuilder({ page })
       .include("dialog.zf-viewer")
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

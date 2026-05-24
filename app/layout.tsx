@@ -54,6 +54,11 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+// Runs before first paint: resolves the persisted theme mode (light/dark/auto,
+// default auto) against the OS preference and sets data-theme on <html> so the
+// correct palette is applied with no flash. Kept in sync with theme-toggle.tsx.
+const themeScript = `(function(){try{var m=localStorage.getItem('zf-theme-mode');if(m!=='light'&&m!=='dark'&&m!=='auto')m='auto';var d=m==='dark'||(m==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -61,7 +66,11 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body suppressHydrationWarning>
         <DocumentViewerProvider>
           <Nav />

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { NAV, SITE } from "../_data/site";
+import { NAV } from "../_data/site";
 import { MenuIcon, CloseIcon } from "./icons";
+import { ThemeToggle } from "./theme-toggle";
 
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
@@ -27,33 +28,36 @@ export function Nav() {
     <header className={`zf-nav${scrolled ? " scrolled" : ""}`}>
       <nav className="zf-nav-inner" aria-label="Primary">
         <Link href="/" className="zf-nav-brand">
-          {SITE.name}
-          <span className="dot">.</span>
+          zulfahmi<span className="dot">.</span>dev
         </Link>
 
-        <ul className="zf-nav-links">
-          {NAV.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className={`zf-nav-link${isActive(pathname, item.href) ? " active" : ""}`}
-                aria-current={isActive(pathname, item.href) ? "page" : undefined}
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div className="zf-nav-right">
+          <ul className="zf-nav-links">
+            {NAV.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`zf-nav-link${isActive(pathname, item.href) ? " active" : ""}`}
+                  aria-current={isActive(pathname, item.href) ? "page" : undefined}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-        <button
-          type="button"
-          className="zf-nav-toggle"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <CloseIcon /> : <MenuIcon />}
-        </button>
+          <ThemeToggle />
+
+          <button
+            type="button"
+            className="zf-nav-toggle"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        </div>
       </nav>
 
       <div className={`zf-nav-mobile${open ? " open" : ""}`}>
