@@ -29,6 +29,10 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
+        env:
+          # Contact form posts here (Cloudflare Worker → Resend). Set as a repo
+          # variable; falls back to a mailto: compose when empty.
+          NEXT_PUBLIC_CONTACT_ENDPOINT: ${{ vars.NEXT_PUBLIC_CONTACT_ENDPOINT }}
       # deploy-pages skips Jekyll, but keep _next safe if the source ever changes.
       - run: touch out/.nojekyll
       - uses: actions/configure-pages@v5
