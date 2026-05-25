@@ -22,7 +22,7 @@
 
 export interface Env {
   RESEND_API_KEY: string;
-  ALLOWED_ORIGIN: string; // e.g. "https://zulfahmi.dev"
+  ALLOWED_ORIGIN: string; // comma-separated origins, e.g. "https://zulfahmi.dev,http://localhost:3000"
   FROM_EMAIL: string;     // verified sender, e.g. "Portfolio <contact@zulfahmi.dev>"
   TO_EMAIL: string;       // inbox that receives the message
 }
@@ -70,9 +70,15 @@ function isPayload(value: unknown): value is Payload {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const allowed = env.ALLOWED_ORIGIN || "";
+    const allowedOrigins = (env.ALLOWED_ORIGIN || "")
+      .split(",")
+      .map((o) => o.trim())
+      .filter(Boolean);
     const origin = request.headers.get("Origin") ?? "";
-    const allowOrigin = origin === allowed ? origin : allowed;
+    const originAllowed = allowedOrigins.length === 0 || allowedOrigins.includes(origin);
+    // Echo the caller's origin only when it's on the list; otherwise fall back to
+    // the first configured origin so a disallowed browser request is CORS-blocked.
+    const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0] ?? "";
 
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders(allowOrigin) });
@@ -80,7 +86,9 @@ export default {
     if (request.method !== "POST") {
       return json({ ok: false, error: "Method not allowed" }, 405, allowOrigin);
     }
-    if (allowed && origin && origin !== allowed) {
+    // Reject browser requests from origins not on the list. Requests with no
+    // Origin header (curl, server-to-server) fall through to validation.
+    if (origin && !originAllowed) {
       return json({ ok: false, error: "Forbidden origin" }, 403, allowOrigin);
     }
 
